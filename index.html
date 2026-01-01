@@ -1,255 +1,150 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>圣诞树 - 示例页面</title>
-  <style>
-    /* 基础重置 */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
-    body {
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: radial-gradient(circle at 20% 10%, #102030 0%, #081021 45%, #02030a 100%);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 32px;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🎄 圣诞快乐</title>
 
-    /* 页面容器 */
-    .stage {
-      width: min(920px, 94vw);
-      height: min(760px, 82vh);
-      position: relative;
-      overflow: hidden;
-      border-radius: 12px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.08));
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-      padding: 24px;
-    }
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #0b1d33, #02010a);
+  overflow: hidden;
+}
 
-    /* 雪 - CSS多个层次的动画 */
-    .snow-layer {
-      position: absolute; inset: 0; pointer-events: none; z-index: 1;
-    }
-    .snow-layer::before, .snow-layer::after {
-      content: ""; position: absolute; inset: -10% -10% -10% -10%;
-      background-image: radial-gradient(white 1px, rgba(255,255,255,0) 1px);
-      background-size: 6px 6px; opacity: 0.05;
-      animation: drift 20s linear infinite;
-    }
-    .snow-layer::after { background-size: 12px 12px; opacity: 0.03; animation-duration: 32s; }
-    @keyframes drift { from { transform: translateY(-10%) translateX(0);} to { transform: translateY(10%) translateX(-8%);} }
+/* 中央容器 */
+.scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
 
-    /* 舞台内元素 */
-    .ground { position: absolute; left:0; right:0; bottom:0; height: 140px; background: linear-gradient(#06121a, #0a1a23); z-index: 5; }
-    .ground::before { content: ''; position:absolute; inset: -20px 10% 0 10%; background: linear-gradient(#fff5, transparent); border-radius: 50%; height: 40px; }
+/* 圣诞树 */
+.tree {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+}
 
-    /* 树的容器 */
-    .tree-wrap { position: absolute; left: 50%; transform: translateX(-50%); bottom: 120px; width: 360px; z-index: 6; }
+.layer {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 120px solid transparent;
+  border-right: 120px solid transparent;
+  border-bottom: 160px solid #1e7f3b;
+}
 
-    /* 使用SVG绘制树形：样式约束 */
-    svg { display:block; width:100%; height:auto; }
+.layer:nth-child(1) {
+  top: 0;
+  transform: translateX(-50%) scale(0.7);
+}
+.layer:nth-child(2) {
+  top: 90px;
+  transform: translateX(-50%) scale(0.85);
+}
+.layer:nth-child(3) {
+  top: 180px;
+}
 
-    /* 星星 */
-    .star { filter: drop-shadow(0 0 6px rgba(255,230,120,0.9)); transform-origin: center; animation: star-flicker 3s infinite; }
-    @keyframes star-flicker { 0%{opacity:0.9; transform:scale(1);}50%{opacity:0.6; transform:scale(1.06);}100%{opacity:0.9; transform:scale(1);} }
+/* 树干 */
+.trunk {
+  position: absolute;
+  top: 330px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 60px;
+  background: #6b3e26;
+  border-radius: 5px;
+}
 
-    /* 装饰球 */
-    .ornament { transition: transform 0.2s ease; cursor: default; }
-    .ornament:hover { transform: translateY(-6px) scale(1.06); }
+/* 灯 */
+.light {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: blink 1.5s infinite alternate;
+}
 
-    /* 灯光（可用JS控制闪烁）*/
-    .light { filter: drop-shadow(0 0 6px); opacity: 0.95; }
+@keyframes blink {
+  from { opacity: 0.3; }
+  to { opacity: 1; }
+}
 
-    /* 树干 */
-    .trunk { fill: #5b3a24; }
+.off .light {
+  opacity: 0.2 !important;
+  animation: none;
+}
 
-    /* 礼物 */
-    .gifts { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display:flex; gap:12px; z-index:7; }
-    .gift { width: 84px; height: 56px; border-radius:8px; display:flex; align-items:center; justify-content:center; box-shadow: 0 6px 14px rgba(0,0,0,0.45); }
-    .ribbon { position:absolute; height:12px; width:100%; left:0; top:22px; }
+/* 雪花 */
+.snow {
+  position: absolute;
+  top: -10px;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: fall linear infinite;
+}
 
-    /* 控制条 */
-    .controls { position: absolute; right: 18px; top: 18px; z-index:10; display:flex; gap:8px; }
-    .btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06); padding:8px 12px; border-radius:8px; color:#fff; cursor:pointer; font-size:14px; }
-    .btn:active { transform: translateY(1px); }
+@keyframes fall {
+  to {
+    transform: translateY(110vh);
+  }
+}
 
-    /* 响应式 */
-    @media (max-width:600px){ .tree-wrap{ width:260px; bottom:100px; } .gifts{ transform: translateX(-50%) scale(0.86);} }
-  </style>
+/* 按钮 */
+.controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+button {
+  padding: 10px 16px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+
+button:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* 祝福语 */
+.message {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  color: #fff;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+</style>
 </head>
+
 <body>
-  <div class="stage" role="main" aria-label="圣诞树演示">
-    <div class="snow-layer" aria-hidden></div>
+<div class="scene" id="scene">
 
-    <div class="controls" aria-hidden>
-      <button id="toggleLights" class="btn">开/关 灯光</button>
-      <button id="twinkle" class="btn">闪烁一次</button>
-    </div>
-
-    <div class="tree-wrap">
-      <!-- 使用 SVG 绘制圣诞树：三层三角形 + 星 + 装饰 -->
-      <svg viewBox="0 0 360 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="false" role="img">
-        <!-- 树叶层：通过三层渐变的路径实现柔和边缘 -->
-        <defs>
-          <linearGradient id="leafGrad" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stop-color="#0f8b2f" />
-            <stop offset="100%" stop-color="#0b5b1d" />
-          </linearGradient>
-          <radialGradient id="leafShine" cx="30%" cy="20%" r="70%">
-            <stop offset="0%" stop-color="#7df085" stop-opacity="0.22" />
-            <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
-          </radialGradient>
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-
-        <!-- 底部三角 -->
-        <path d="M180 240 L30 420 L330 420 Z" fill="url(#leafGrad)" />
-        <!-- 中间三角 -->
-        <path d="M180 120 L60 320 L300 320 Z" fill="url(#leafGrad)" />
-        <!-- 顶部三角 -->
-        <path d="M180 20 L105 220 L255 220 Z" fill="url(#leafGrad)" />
-
-        <!-- 树体高光层 -->
-        <path d="M180 26 L120 210 L240 210 Z" fill="url(#leafShine)" opacity="0.9" />
-
-        <!-- 星星 -->
-        <g transform="translate(180,8) scale(0.9)" class="star">
-          <polygon points="0,-24 6,-6 24,-6 9,6 14,24 0,12 -14,24 -9,6 -24,-6 -6,-6" fill="#ffd94d" stroke="#ffd" stroke-width="0.8" />
-        </g>
-
-        <!-- 装饰：几个彩色球、灯 -->
-        <g id="ornaments">
-          <!-- 装饰球（静态） -->
-          <circle class="ornament" cx="150" cy="180" r="8" fill="#ff4d6d" />
-          <circle class="ornament" cx="210" cy="170" r="7" fill="#ffd24d" />
-          <circle class="ornament" cx="120" cy="260" r="9" fill="#4da6ff" />
-          <circle class="ornament" cx="240" cy="260" r="8" fill="#a64dff" />
-
-          <!-- 灯光（将由JS控制闪烁） -->
-          <circle class="light" data-light="1" cx="170" cy="140" r="4" fill="#ffd24d" />
-          <circle class="light" data-light="2" cx="130" cy="200" r="4" fill="#ff6ad1" />
-          <circle class="light" data-light="3" cx="210" cy="220" r="4" fill="#67f0ff" />
-          <circle class="light" data-light="4" cx="190" cy="260" r="4" fill="#9dff8c" />
-          <circle class="light" data-light="5" cx="150" cy="300" r="4" fill="#ff9d6f" />
-        </g>
-
-        <!-- 树干 -->
-        <rect x="156" y="420" width="48" height="60" rx="6" class="trunk" />
-      </svg>
-    </div>
-
-    <!-- 礼物 -->
-    <div class="gifts" aria-hidden>
-      <div class="gift" style="background:#e04c6b; position:relative;">
-        <div class="ribbon" style="background:linear-gradient(90deg, rgba(255,255,255,0.08), rgba(0,0,0,0.06));"></div>
-        <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:600;">礼物</div>
-      </div>
-      <div class="gift" style="background:#2f9ad6; position:relative;">
-        <div class="ribbon" style="background:linear-gradient(90deg, rgba(0,0,0,0.06), rgba(255,255,255,0.06));"></div>
-        <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:600;">礼物</div>
-      </div>
-    </div>
-
-    <div class="ground" aria-hidden></div>
+  <div class="tree" id="tree">
+    <div class="layer"></div>
+    <div class="layer"></div>
+    <div class="layer"></div>
+    <div class="trunk"></div>
   </div>
 
-  <script>
-    /* 简单的灯光控制逻辑：随机闪烁 + 开/关 */
-    (function(){
-      const lights = Array.from(document.querySelectorAll('.light'));
-      let running = true;
-      let flickerInterval;
-
-      function randomBright(el){
-        // 使用CSS filter 的亮度模拟闪烁
-        const bright = 1 + Math.random() * 1.6; // 1 ~ 2.6
-        const blur = 2 + Math.random() * 4;
-        el.style.filter = `brightness(${bright}) blur(${blur}px) drop-shadow(0 0 ${Math.min(12,blur*3)}px ${el.getAttribute('fill') || '#fff'})`;
-      }
-
-      function settle(el){ el.style.filter = 'brightness(1) blur(0) drop-shadow(0 0 6px rgba(255,255,255,0.05))'; }
-
-      function startFlicker(){
-        stopFlicker();
-        flickerInterval = setInterval(()=>{
-          // 每次选择部分灯光闪烁
-          const count = 1 + Math.floor(Math.random()*lights.length);
-          for (let i=0;i<count;i++){
-            const el = lights[Math.floor(Math.random()*lights.length)];
-            randomBright(el);
-            // 恢复
-            setTimeout(()=>{ if (running) settle(el); }, 250 + Math.random()*900);
-          }
-        }, 420);
-      }
-      function stopFlicker(){ if (flickerInterval) clearInterval(flickerInterval); }
-
-      // 控件
-      document.getElementById('toggleLights').addEventListener('click', ()=>{
-        running = !running;
-        if (running) { startFlicker(); document.getElementById('toggleLights').textContent = '关 灯'; }
-        else { stopFlicker(); lights.forEach(settle); document.getElementById('toggleLights').textContent = '开 灯'; }
-      });
-
-      document.getElementById('twinkle').addEventListener('click', ()=>{
-        // 强制一次闪烁
-        for (let i=0;i<6;i++){
-          const el = lights[Math.floor(Math.random()*lights.length)];
-          randomBright(el);
-          setTimeout(()=>{ settle(el); }, 250 + Math.random()*700);
-        }
-      });
-
-      // 启动
-      startFlicker();
-
-      // 附加：按空格键触发闪烁
-      window.addEventListener('keydown', (e)=>{ if (e.code === 'Space') { e.preventDefault(); document.getElementById('twinkle').click(); } });
-    })();
-
-    /* 简单的雪花画布（性能友好）*/
-    (function(){
-      const canvas = document.createElement('canvas');
-      canvas.style.position = 'absolute'; canvas.style.inset = 0; canvas.style.zIndex = 2; canvas.style.pointerEvents = 'none';
-      document.querySelector('.stage').appendChild(canvas);
-      const ctx = canvas.getContext('2d');
-      let W, H, flakes;
-
-      function reset(){
-        W = canvas.width = document.querySelector('.stage').clientWidth;
-        H = canvas.height = document.querySelector('.stage').clientHeight;
-        flakes = Array.from({length: Math.round(W/10)}, ()=>({
-          x: Math.random()*W, y: Math.random()*H, r: 0.6 + Math.random()*3.6, d: 0.5 + Math.random()*1.5, sway: Math.random()*2*Math.PI
-        }));
-      }
-
-      function updateAndDraw(){
-        ctx.clearRect(0,0,W,H);
-        ctx.fillStyle = 'rgba(255,255,255,0.85)';
-        for (let f of flakes){
-          f.y += f.d;
-          f.x += Math.sin(f.sway) * 0.6;
-          f.sway += 0.01;
-          if (f.y > H + 6){ f.y = -10; f.x = Math.random()*W; }
-          ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI*2); ctx.fill();
-        }
-        requestAnimationFrame(updateAndDraw);
-      }
-
-      window.addEventListener('resize', reset);
-      reset();
-      updateAndDraw();
-    })();
-  </script>
-</body>
-</html>
+  <div class="controls">
+    <but
