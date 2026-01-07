@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>塑料模具设计与注射成型测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .question-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .options-container {
+            margin-bottom: 20px;
+        }
+
+        .option {
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+
+        .option:hover {
+            background-color: #e9f7fe;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            border-color: #3498db;
+            background-color: #e9f7fe;
+        }
+
+        .option.correct {
+            border-color: #2ecc71;
+            background-color: #e8f8f5;
+        }
+
+        .option.incorrect {
+            border-color: #e74c3c;
+            background-color: #fdedec;
+        }
+
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .result-container.correct {
+            background-color: #e8f8f5;
+            border-left: 5px solid #2ecc71;
+        }
+
+        .result-container.incorrect {
+            background-color: #fdedec;
+            border-left: 5px solid #e74c3c;
+        }
+
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .correct-answer {
+            margin-bottom: 10px;
+        }
+
+        .explanation {
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .nav-button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            background-color: #2980b9;
+        }
+
+        .nav-button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .directory {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .directory-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .directory-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 10px;
+        }
+
+        .directory-item {
+            padding: 8px;
+            text-align: center;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .directory-item:hover {
+            background-color: #dee2e6;
+        }
+
+        .directory-item.current {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .directory-item.answered {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .directory-item.answered-incorrect {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .hint {
+            text-align: center;
+            color: #7f8c8d;
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>塑料模具设计与注射成型测试</h1>
+        </header>
+
+        <main>
+            <div class="question-info">
+                <div class="question-number">题目 <span id="current-question">1</span> / <span id="total-questions">76</span></div>
+                <div class="progress">进度：<span id="answered-count">0</span>/<span id="total-questions-2">76</span></div>
+            </div>
+
+            <div class="question-container">
+                <div class="question-text" id="question-text">
+                    题目加载中...
+                </div>
+
+                <div class="options-container" id="options-container">
+                    <!-- 选项将通过JavaScript动态生成 -->
+                </div>
+
+                <div class="result-container" id="result-container">
+                    <div class="result-title" id="result-title"></div>
+                    <div class="correct-answer" id="correct-answer"></div>
+                    <div class="explanation" id="explanation"></div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="nav-button" id="prev-button" disabled>上一题</button>
+                <button class="nav-button" id="next-button">下一题</button>
+            </div>
+
+            <div class="directory">
+                <div class="directory-title">题目目录</div>
+                <div class="directory-items" id="directory-items">
+                    <!-- 题目目录将通过JavaScript动态生成 -->
+                </div>
+            </div>
+
+            <div class="hint">提示：点击选项自动提交答案，按空格键切换到下一题</div>
+        </main>
+    </div>
+
+    <script>
+        // ==================== 题库数据替换位置 ====================
+        // 以下为塑料模具设计与注射成型测试的题库数据
+        // 如需更换科目，只需替换此数组内容即可，核心代码无需修改
+        const questions = [
+            {
+                id: 1,
+                question: "双分型面注射模具（三板模）相比单分型面模具，最典型的特点是（      ）",
+                options: [
+                    { id: "A", text: "结构更简单" },
+                    { id: "B", text: "成本更低" },
+                    { id: "C", text: "增加了可移动的流道板" },
+                    { id: "D", text: "无需设计浇注系统" }
+                ],
+                correctAnswer: "C",
+                explanation: "双分型面模具在定模部分增加了一个可移动的流道板（或称中间板），用于实现浇注系统凝料和塑件的自动分离。"
+            },
+            {
+                id: 2,
+                question: "以下哪种模具结构适用于成型带有侧孔或侧凹的塑件（      ）",
+                options: [
+                    { id: "A", text: "单分型面模具" },
+                    { id: "B", text: "双分型面模具" },
+                    { id: "C", text: "带有侧向分型与抽芯机构的模具" },
+                    { id: "D", text: "推板脱模模具" }
+                ],
+                correctAnswer: "C",
+                explanation: "当成型塑件有侧孔、侧凹或凸台时，会阻碍塑件直接脱模，必须采用侧向分型与抽芯机构。"
+            },
+            {
+                id: 3,
+                question: "以下哪种浇口类型特别适用于一模多腔的平衡布置（      ）",
+                options: [
+                    { id: "A", text: "直接浇口" },
+                    { id: "B", text: "侧浇口" },
+                    { id: "C", text: "点浇口" },
+                    { id: "D", text: "轮辐浇口" }
+                ],
+                correctAnswer: "C",
+                explanation: "点浇口在模具上易于实现一模多腔的平衡排布，使熔体能同时均匀地充满各个型腔，有利于保证塑件质量的一致性。"
+            },
+            {
+                id: 4,
+                question: "以下关于冷料穴作用的描述，错误的是（      ）",
+                options: [
+                    { id: "A", text: "储存熔体前端的冷料" },
+                    { id: "B", text: "拉出主流道凝料" },
+                    { id: "C", text: "提高熔体温度" },
+                    { id: "D", text: "防止冷料堵塞浇口" }
+                ],
+                correctAnswer: "C",
+                explanation: "冷料穴的作用是收集熔体流动前锋的'冷料'，防止其进入型腔造成充填不满或影响塑件质量，它本身并不具备提高熔体温度的功能。"
+            },
+            {
+                id: 5,
+                question: "模具的'分型面'是指（      ）",
+                options: [
+                    { id: "A", text: "模具冷却水流动的面" },
+                    { id: "B", text: "动模与定模的接触面" },
+                    { id: "C", text: "塑件上的分模线" },
+                    { id: "D", text: "推杆与模板的配合面" }
+                ],
+                correctAnswer: "B",
+                explanation: "分型面是指为了塑件的脱模和安放嵌件，模具上用于取出塑件和浇注系统凝料的可分离的接触表面，即动模与定模的接触面。"
+            },
+            {
+                id: 6,
+                question: "注射机型号XS-ZY-125中的'125'表示的是（      ）",
+                options: [
+                    { id: "A", text: "最大注射压力" },
+                    { id: "B", text: "锁模力" },
+                    { id: "C", text: "注射容量" },
+                    { id: "D", text: "拉杆间距" }
+                ],
+                correctAnswer: "C",
+                explanation: "国产注射机型号XS-ZY-125中，'125'表示其理论注射容量（或注射量）为125cm³。"
+            },
+            {
+                id: 7,
+                question: "注射成型工艺中，保压阶段的主要作用是（      ）",
+                options: [
+                    { id: "A", text: "使塑料塑化" },
+                    { id: "B", text: "防止物料回流并补充收缩" },
+                    { id: "C", text: "开启模具" },
+                    { id: "D", text: "注射塑料熔体" }
+                ],
+                correctAnswer: "B",
+                explanation: "保压阶段是在注射完成后，为了防止熔体倒流并补偿塑件冷却收缩，继续对型腔内的熔体施加压力的过程。"
+            },
+            {
+                id: 8,
+                question: "下列塑料中，属于热固性塑料的是（      ）",
+                options: [
+                    { id: "A", text: "聚丙烯(PP)" },
+                    { id: "B", text: "聚酰胺(PA)" },
+                    { id: "C", text: "酚醛塑料(PF)" },
+                    { id: "D", text: "聚碳酸酯(PC)" }
+                ],
+                correctAnswer: "C",
+                explanation: "酚醛塑料(PF)在受热固化后成为不熔不溶的体型结构，是典型的热固性塑料。其他选项均为热塑性塑料。"
+            },
+            {
+                id: 9,
+                question: "热流道模具技术与传统冷流道模具相比，其最大优点是？",
+                options: [
+                    { id: "A", text: "模具结构简单" },
+                    { id: "B", text: "无需脱模机构" },
+                    { id: "C", text: "节约原材料" },
+                    { id: "D", text: "成型周期长" }
+                ],
+                correctAnswer: "C",
+                explanation: "热流道模具在每次注射成型后，流道内的塑料始终保持熔融状态，不随塑件脱模，因此无需回收料把，节约了原材料。"
+            },
+            {
+                id: 10,
+                question: "以下关于浇口的描述，正确的是？",
+                options: [
+                    { id: "A", text: "浇口尺寸越大越好" },
+                    { id: "B", text: "浇口是连接分流道与型腔的细短通道" },
+                    { id: "C", text: "浇口位置对塑件质量无影响" },
+                    { id: "D", text: "所有浇口都会在塑件上留下明显痕迹" }
+                ],
+                correctAnswer: "B",
+                explanation: "浇口是连接分流道与型腔的进料通道，其截面通常较小，长度也短。A、C、D选项的描述都是片面的或错误的。"
+            },
+            {
+                id: 11,
+                question: "以下哪项不是注射机合模系统的主要参数（      ）",
+                options: [
+                    { id: "A", text: "合模力" },
+                    { id: "B", text: "注射压力" },
+                    { id: "C", text: "模板行程" },
+                    { id: "D", text: "拉杆间距" }
+                ],
+                correctAnswer: "B",
+                explanation: "注射压力是注射系统的主要参数。合模系统的主要参数包括合模力、模板行程、拉杆间距、模板尺寸等。"
+            },
+            {
+                id: 12,
+                question: "对于透明度要求高的塑料制品（如聚苯乙烯PS），应优先选用哪种顶出方式（      ）",
+                options: [
+                    { id: "A", text: "圆推杆顶出" },
+                    { id: "B", text: "扁推杆顶出" },
+                    { id: "C", text: "推件板顶出" },
+                    { id: "D", text: "气动顶出" }
+                ],
+                correctAnswer: "C",
+                explanation: "推件板顶出作用面积大、顶出力均匀，不会在塑件表面留下明显的顶出痕迹，有利于保持高透明度塑件的光学性能。"
+            },
+            {
+                id: 13,
+                question: "对于大型深腔壳体塑件，最常采用的脱模机构是（      ）",
+                options: [
+                    { id: "A", text: "推杆脱模" },
+                    { id: "B", text: "推管脱模" },
+                    { id: "C", text: "推件板脱模" },
+                    { id: "D", text: "气压脱模" }
+                ],
+                correctAnswer: "C",
+                explanation: "推件板脱模机构在脱模过程中推力均匀，塑件不易变形，且不会留下明显的顶出痕迹，特别适用于深腔、薄壁壳体和不允许有推杆痕迹的塑件。"
+            },
+            {
+                id: 14,
+                question: "注射模具中，导向机构的主要作用不包括（      ）",
+                options: [
+                    { id: "A", text: "保证动、定模合模准确" },
+                    { id: "B", text: "承受侧向压力" },
+                    { id: "C", text: "顶出塑件" },
+                    { id: "D", text: "引导推板运动" }
+                ],
+                correctAnswer: "C",
+                explanation: "导向机构（如导柱、导套）主要用于合模时引导动定模准确对中，并承受侧压力。顶出塑件是脱模机构的功能。"
+            },
+            {
+                id: 15,
+                question: "斜导柱侧抽芯机构中，锁紧块（楔紧块）的主要作用是（      ）",
+                options: [
+                    { id: "A", text: "驱动侧型芯滑块运动" },
+                    { id: "B", text: "在注射时锁紧滑块，防止后退" },
+                    { id: "C", text: "为侧型芯滑块导向" },
+                    { id: "D", text: "顶出塑件" }
+                ],
+                correctAnswer: "B",
+                explanation: "在注射和保压过程中，熔体压力很大，会迫使侧型芯滑块后退。锁紧块的作用就是在合模后压紧滑块，承受此压力，防止其移动。"
+            },
+            {
+                id: 16,
+                question: "模具的成型零件是指（      ）",
+                options: [
+                    { id: "A", text: "构成模具型腔的零件" },
+                    { id: "B", text: "起导向作用的零件" },
+                    { id: "C", text: "起支撑作用的零件" },
+                    { id: "D", text: "固定模板的零件" }
+                ],
+                correctAnswer: "A",
+                explanation: "成型零件是指直接与塑料接触、构成模具型腔以形成塑件形状的零件，如凹模、凸模、型芯、型环等。"
+            },
+            {
+                id: 17,
+                question: "下列不属于塑料模具典型浇注系统组成部分的是（      ）",
+                options: [
+                    { id: "A", text: "主流道" },
+                    { id: "B", text: "分流道" },
+                    { id: "C", text: "冷却水道" },
+                    { id: "D", text: "浇口" }
+                ],
+                correctAnswer: "C",
+                explanation: "浇注系统通常由主流道、分流道、浇口和冷料穴组成。冷却水道属于模具的温度调节系统，不属于浇注系统。"
+            },
+            {
+                id: 18,
+                question: "排气系统对注射成型质量很重要，以下哪项不是常见的排气方式（      ）",
+                options: [
+                    { id: "A", text: "利用分型面间隙排气" },
+                    { id: "B", text: "利用推杆间隙排气" },
+                    { id: "C", text: "设置专用排气槽" },
+                    { id: "D", text: "延长保压时间" }
+                ],
+                correctAnswer: "D",
+                explanation: "延长保压时间是工艺参数调整，与模具的排气结构无关。常见的排气方式包括利用分型面、推杆、型芯等的配合间隙以及开设专用排气槽。"
+            },
+            {
+                id: 19,
+                question: "下列因素中，不会导致塑件产生飞边（披锋）的是（      ）",
+                options: [
+                    { id: "A", text: "合模力不足" },
+                    { id: "B", text: "分型面上有异物" },
+                    { id: "C", text: "注射压力过高" },
+                    { id: "D", text: "冷却时间过长" }
+                ],
+                correctAnswer: "D",
+                explanation: "飞边主要是由于合模不严、注射压力过高导致熔体从分型面溢出所致。冷却时间过长与飞边的产生无直接关系。"
+            },
+            {
+                id: 20,
+                question: "塑料收缩率对模具设计至关重要，其计算公式是（      ）",
+                options: [
+                    { id: "A", text: "（模具尺寸 - 塑件尺寸）/ 塑件尺寸" },
+                    { id: "B", text: "（塑件尺寸 - 模具尺寸）/ 模具尺寸" },
+                    { id: "C", text: "（模具尺寸 - 塑件尺寸）/ 模具尺寸" },
+                    { id: "D", text: "（塑件尺寸 - 模具尺寸）/ 塑件尺寸" }
+                ],
+                correctAnswer: "C",
+                explanation: "根据定义，塑料的收缩率 S = (L模 - L件) / L模 × 100%，其中L模为模具型腔在室温下的尺寸，L件为塑件在室温下的尺寸。"
+            },
+            {
+                id: 21,
+                question: "在推杆脱模机构中，推杆的端面应（      ）",
+                options: [
+                    { id: "A", text: "低于型芯表面" },
+                    { id: "B", text: "高于型芯表面" },
+                    { id: "C", text: "与型芯表面平齐" },
+                    { id: "D", text: "无特定要求" }
+                ],
+                correctAnswer: "C",
+                explanation: "推杆的端面应与型芯表面平齐，否则会在塑件上留下凸台或凹坑，影响塑件外观和使用。"
+            },
+            {
+                id: 22,
+                question: "推出机构中的复位杆主要作用是（      ）",
+                options: [
+                    { id: "A", text: "顶出塑件" },
+                    { id: "B", text: "在合模时使推杆退回" },
+                    { id: "C", text: "导向作用" },
+                    { id: "D", text: "支撑作用" }
+                ],
+                correctAnswer: "B",
+                explanation: "复位杆在合模过程中，先于型芯与定模接触，迫使脱模机构（推杆、推板等）退回到初始位置，为下一次注射成型做准备。"
+            },
+            {
+                id: 23,
+                question: "模具冷却系统的设计原则中，要求冷却水孔尽可能靠近型腔表面且距离均匀，这是为了（      ）",
+                options: [
+                    { id: "A", text: "提高模具强度" },
+                    { id: "B", text: "使模具温度场均匀" },
+                    { id: "C", text: "便于加工" },
+                    { id: "D", text: "节约冷却水" }
+                ],
+                correctAnswer: "B",
+                explanation: "冷却水孔靠近型腔且分布均匀，可以使型腔表面的热量被快速、均匀地带走，从而保证塑件均匀冷却，减少内应力和变形。"
+            },
+            {
+                id: 24,
+                question: "塑料的流动性通常用熔体指数（MI）表示，熔体指数越高，表示该塑料的流动性（      ）",
+                options: [
+                    { id: "A", text: "越差" },
+                    { id: "B", text: "越好" },
+                    { id: "C", text: "与温度无关" },
+                    { id: "D", text: "无法判断" }
+                ],
+                correctAnswer: "B",
+                explanation: "熔体指数（MI）是指在规定的温度和负荷下，10分钟内从标准口模中流出的熔体重量（克数）。MI值越大，表示该塑料的流动性越好。"
+            },
+            {
+                id: 25,
+                question: "在注塑成型中，塑料熔体的流动性通常通过______来衡量，其数值越大，表示熔体的流动性越好。",
+                options: [
+                    { id: "A", text: "熔融指数" },
+                    { id: "B", text: "粘度" },
+                    { id: "C", text: "温度" },
+                    { id: "D", text: "压力" }
+                ],
+                correctAnswer: "A",
+                explanation: "熔融指数（Melt Flow Index, MFI）是衡量塑料熔体流动性的关键指标。数值越高，说明熔体越容易流动，适用于薄壁制品的成型。"
+            },
+            {
+                id: 26,
+                question: "在浇注系统设计中，分流道的横截面形状通常采用______或梯形，以减小熔体流动阻力。",
+                options: [
+                    { id: "A", text: "圆形" },
+                    { id: "B", text: "方形" },
+                    { id: "C", text: "三角形" },
+                    { id: "D", text: "矩形" }
+                ],
+                correctAnswer: "A",
+                explanation: "圆形和梯形截面可以有效减小熔体流动阻力，提高熔体填充效率。"
+            },
+            {
+                id: 27,
+                question: "压缩成型中，加压压力的单位通常是 _____ ，模具温度的控制范围一般在 100~200℃之间。",
+                options: [
+                    { id: "A", text: "MPa" },
+                    { id: "B", text: "kPa" },
+                    { id: "C", text: "Pa" },
+                    { id: "D", text: "N" }
+                ],
+                correctAnswer: "A",
+                explanation: "压缩成型的工艺参数如压力和温度需根据材料特性进行调整。"
+            },
+            {
+                id: 28,
+                question: "标准模架中，推杆固定板与推板之间的连接通常通过螺钉实现，而推板与动模底板之间则通过______连接。",
+                options: [
+                    { id: "A", text: "导柱" },
+                    { id: "B", text: "螺钉" },
+                    { id: "C", text: "销钉" },
+                    { id: "D", text: "焊接" }
+                ],
+                correctAnswer: "A",
+                explanation: "推杆固定板与推板之间一般采用螺钉连接，而推板与动模底板之间则通过导柱进行导向连接，以保证脱模动作的平稳性和准确性。"
+            },
+            {
+                id: 29,
+                question: "在侧向分型机构中，为了防止滑块在合模过程中因受力不均而损坏，通常会在滑块上设置______装置。同时，为了避免滑块在运动过程中发生偏移，还需设置防转装置。",
+                options: [
+                    { id: "A", text: "限位" },
+                    { id: "B", text: "导向" },
+                    { id: "C", text: "锁紧" },
+                    { id: "D", text: "冷却" }
+                ],
+                correctAnswer: "A",
+                explanation: "滑块在运动过程中容易受到侧向力影响，因此需要设置限位装置以防止过度移动，同时设置防转装置以避免滑块旋转造成偏移。"
+            },
+            {
+                id: 30,
+                question: "模具温度调节系统的设计需考虑热传导、对流和辐射三种传热方式。其中，______是最主要的传热方式，特别是在冷却过程中。",
+                options: [
+                    { id: "A", text: "对流" },
+                    { id: "B", text: "传导" },
+                    { id: "C", text: "辐射" },
+                    { id: "D", text: "蒸发" }
+                ],
+                correctAnswer: "A",
+                explanation: "在模具温度调节系统中，冷却过程主要依赖冷却介质（如水）与模具之间的对流传热。因此，对流是实现快速降温的主要机制。"
+            },
+            {
+                id: 31,
+                question: "压缩成型中，模具的脱模斜度通常设计为 1~3 度，以减少脱模时的阻力。压缩成型的冷却时间通常比注射成型 _____ 。",
+                options: [
+                    { id: "A", text: "长" },
+                    { id: "B", text: "短" },
+                    { id: "C", text: "相同" },
+                    { id: "D", text: "无法比较" }
+                ],
+                correctAnswer: "A",
+                explanation: "合理的脱模斜度和较长的冷却时间有助于提高制品质量和脱模效果。"
+            },
+            {
+                id: 32,
+                question: "挤出成型中，口模的出口膨胀率一般控制在1.5以内，以避免制品出现______现象。",
+                options: [
+                    { id: "A", text: "熔体破裂" },
+                    { id: "B", text: "收缩" },
+                    { id: "C", text: "翘曲" },
+                    { id: "D", text: "气泡" }
+                ],
+                correctAnswer: "A",
+                explanation: "口模出口处的熔体由于剪切应力的释放会产生膨胀效应，称为巴拉斯效应。出口膨胀率过高会导致熔体破裂，影响制品表面质量，因此通常控制在1.5以内。"
+            },
+            {
+                id: 33,
+                question: "在注射成型过程中，为了防止塑件粘附在模具上，通常会在模具表面喷涂脱模剂，常用的脱模剂包括硅油类、蜡类和______类。",
+                options: [
+                    { id: "A", text: "水基" },
+                    { id: "B", text: "油基" },
+                    { id: "C", text: "粉末" },
+                    { id: "D", text: "气体" }
+                ],
+                correctAnswer: "A",
+                explanation: "脱模剂的选择需考虑塑件材质、模具材料以及生产效率等因素。硅油类脱模剂具有良好的脱模效果，但可能影响后续加工；蜡类脱模剂成本较低，适合大批量生产；水基脱模剂环保但干燥时间较长。"
+            },
+            {
+                id: 34,
+                question: "压注成型模具中，常见的浇口形式有直浇口、侧浇口和________三种。",
+                options: [
+                    { id: "A", text: "潜伏浇口" },
+                    { id: "B", text: "点浇口" },
+                    { id: "C", text: "扇形浇口" },
+                    { id: "D", text: "薄膜浇口" }
+                ],
+                correctAnswer: "A",
+                explanation: "不同的浇口形式适用于不同的制品结构和成型要求。"
+            },
+            {
+                id: 35,
+                question: "塑料成型时，为了提高材料的加工性能，常添加______作为润滑剂；为了改善外观，常加入颜料作为着色剂。",
+                options: [
+                    { id: "A", text: "石蜡" },
+                    { id: "B", text: "硅油" },
+                    { id: "C", text: "石墨" },
+                    { id: "D", text: "硬脂酸" }
+                ],
+                correctAnswer: "A",
+                explanation: "润滑剂如石蜡可降低熔体与模具表面的摩擦力，改善脱模效果；颜料用于赋予塑料制品所需的颜色，提升产品外观质量。"
+            },
+            {
+                id: 36,
+                question: "热塑性塑料在加热时会软化，冷却后又会_______。",
+                options: [
+                    { id: "A", text: "硬化" },
+                    { id: "B", text: "保持软化" },
+                    { id: "C", text: "分解" },
+                    { id: "D", text: "不变" }
+                ],
+                correctAnswer: "A",
+                explanation: "热塑性塑料具有可逆的物理状态变化特性，这是其区别于热固性塑料的重要特征。"
+            },
+            {
+                id: 37,
+                question: "塑料是由_______和添加剂组成的高分子材料。",
+                options: [
+                    { id: "A", text: "树脂" },
+                    { id: "B", text: "单体" },
+                    { id: "C", text: "聚合物" },
+                    { id: "D", text: "填料" }
+                ],
+                correctAnswer: "A",
+                explanation: "塑料主要由树脂作为基体，添加各种功能性添加剂组成，以满足不同的性能需求。"
+            },
+            {
+                id: 38,
+                question: "挤出成型中，冷却定型阶段的关键参数包括冷却介质温度、冷却时间以及冷却速度。其中，______对制品尺寸稳定性影响较大。",
+                options: [
+                    { id: "A", text: "冷却速度" },
+                    { id: "B", text: "冷却介质温度" },
+                    { id: "C", text: "冷却时间" },
+                    { id: "D", text: "环境温度" }
+                ],
+                correctAnswer: "A",
+                explanation: "冷却定型阶段直接影响制品的尺寸精度和力学性能。冷却速度过快可能导致内应力增加，过慢则可能影响生产效率。因此，合理控制冷却速度是关键。"
+            },
+            {
+                id: 39,
+                question: "压注成型中，制品的脱模方式主要有机械脱模和________两种。",
+                options: [
+                    { id: "A", text: "液压脱模" },
+                    { id: "B", text: "气动脱模" },
+                    { id: "C", text: "手动脱模" },
+                    { id: "D", text: "自动脱模" }
+                ],
+                correctAnswer: "A",
+                explanation: "机械脱模依靠模具运动实现脱模，液压脱模则利用液体压力辅助脱模。"
+            },
+            {
+                id: 40,
+                question: "在塑料模具设计中，侧向分型机构常用于成型带侧凹结构的塑件，例如齿轮、凸台等。这种结构需要通过侧向抽芯来实现脱模，因此模具设计时需要考虑______的运动空间。",
+                options: [
+                    { id: "A", text: "滑块" },
+                    { id: "B", text: "型芯" },
+                    { id: "C", text: "推杆" },
+                    { id: "D", text: "导柱" }
+                ],
+                correctAnswer: "A",
+                explanation: "侧向分型机构主要用于成型具有侧凹结构的塑件，如齿轮、凸台等。这类结构需要滑块进行侧向抽芯，因此模具设计时必须预留足够的滑块运动空间。"
+            },
+            {
+                id: 41,
+                question: "根据塑料的热行为特性，可将其分为热塑性塑料和_______塑料两大类。",
+                options: [
+                    { id: "A", text: "热固性" },
+                    { id: "B", text: "弹性体" },
+                    { id: "C", text: "工程塑料" },
+                    { id: "D", text: "通用塑料" }
+                ],
+                correctAnswer: "A",
+                explanation: "根据塑料的热行为特性，可将其分为热塑性塑料和热固性塑料两大类。"
+            },
+            {
+                id: 42,
+                question: "在注射模具中，用于制造冷却系统的常用材料有铜合金、不锈钢和______，它们的主要优点是具有良好的导热性和加工性能。",
+                options: [
+                    { id: "A", text: "铝合金" },
+                    { id: "B", text: "钛合金" },
+                    { id: "C", text: "碳钢" },
+                    { id: "D", text: "铸铁" }
+                ],
+                correctAnswer: "A",
+                explanation: "铜合金、不锈钢和铝合金具有良好的导热性和加工性能，适合用于制造注射模具的冷却系统。"
+            },
+            {
+                id: 43,
+                question: "在注射成型中，冷却阶段的主要目的是使制品定型，同时减少______。",
+                options: [
+                    { id: "A", text: "内应力" },
+                    { id: "B", text: "变形" },
+                    { id: "C", text: "收缩" },
+                    { id: "D", text: "气泡" }
+                ],
+                correctAnswer: "A",
+                explanation: "冷却阶段是注射成型的重要环节，通过控制冷却时间与温度，使制品充分固化并定型，同时避免因冷却不均导致的内应力集中和翘曲变形。"
+            },
+            {
+                id: 44,
+                question: "在注射模具中，常用的耐腐蚀材料有304不锈钢和S136钢，它们的主要优点是______。",
+                options: [
+                    { id: "A", text: "具有良好的耐腐蚀性能" },
+                    { id: "B", text: "硬度高" },
+                    { id: "C", text: "成本低" },
+                    { id: "D", text: "易于加工" }
+                ],
+                correctAnswer: "A",
+                explanation: "304不锈钢和S136钢具有良好的耐腐蚀性能，适用于注射模具中接触腐蚀性塑料的部位。"
+            },
+            {
+                id: 45,
+                question: "在模具温度控制系统中，加热元件通常采用______或加热板，其安装位置应避开制品的浇口和流道区域，以防止局部过热。",
+                options: [
+                    { id: "A", text: "电热棒" },
+                    { id: "B", text: "电热丝" },
+                    { id: "C", text: "蒸汽管" },
+                    { id: "D", text: "热水管" }
+                ],
+                correctAnswer: "A",
+                explanation: "加热元件的选择和布置对模具温度均匀性和制品质量至关重要。电热棒和加热板是常见的加热方式，但需注意避免在浇口和流道附近布置，以免影响熔体流动。"
+            },
+            {
+                id: 46,
+                question: "在塑料模具设计中，导柱的作用是引导动模与定模的准确闭合，其安装位置通常位于模架的前模板和______之间。",
+                options: [
+                    { id: "A", text: "后模板" },
+                    { id: "B", text: "推板" },
+                    { id: "C", text: "型腔板" },
+                    { id: "D", text: "型芯板" }
+                ],
+                correctAnswer: "A",
+                explanation: "导柱通常安装在前模板和后模板之间，以保证模具在开合过程中导向准确，防止偏移或磨损。"
+            },
+            {
+                id: 47,
+                question: "在塑料模具设计中，成型零件的尺寸精度直接影响制件的质量。通常，型腔尺寸的公差值应小于等于制件尺寸公差的_______，而型芯尺寸的公差值应小于等于制件尺寸公差的1/4。",
+                options: [
+                    { id: "A", text: "1/3" },
+                    { id: "B", text: "1/2" },
+                    { id: "C", text: "1/4" },
+                    { id: "D", text: "2/3" }
+                ],
+                correctAnswer: "A",
+                explanation: "在塑料模具设计中，为了保证制件的尺寸精度，型腔和型芯的制造公差需要控制在制件尺寸公差的一定比例范围内。通常，型腔尺寸的公差值应小于等于制件尺寸公差的1/3，而型芯尺寸的公差值应小于等于制件尺寸公差的1/4。这是因为在实际生产中，型腔和型芯的磨损、热膨胀等因素会影响最终制件的尺寸精度。"
+            },
+            {
+                id: 48,
+                question: "注射成型中，塑料熔体在模具型腔内的流动状态通常分为层流和_______两种形式。",
+                options: [
+                    { id: "A", text: "湍流" },
+                    { id: "B", text: "层流" },
+                    { id: "C", text: "过渡流" },
+                    { id: "D", text: "塞流" }
+                ],
+                correctAnswer: "A",
+                explanation: "在注射成型中，熔体在模具型腔内的流动状态可以是层流或湍流。层流流动稳定，适合精密成型；湍流流动速度快，但可能导致气泡等问题。"
+            },
+            {
+                id: 49,
+                question: "在注射成型制品设计中，加强筋的设计方向应与制品的主应力方向一致，以提高其______能力。",
+                options: [
+                    { id: "A", text: "承载" },
+                    { id: "B", text: "美观" },
+                    { id: "C", text: "散热" },
+                    { id: "D", text: "成型" }
+                ],
+                correctAnswer: "A",
+                explanation: "加强筋的设计方向应与主应力方向一致，这样才能更有效地提高制品的承载能力。"
+            },
+            {
+                id: 50,
+                question: "在注射成型制品设计中，为了减少应力集中，通常会在转角处设计成圆角，以改善熔体的______性能。",
+                options: [
+                    { id: "A", text: "流动" },
+                    { id: "B", text: "冷却" },
+                    { id: "C", text: "固化" },
+                    { id: "D", text: "收缩" }
+                ],
+                correctAnswer: "A",
+                explanation: "圆角设计可以有效减少应力集中，同时改善熔体的流动性能，是注射成型制品设计中的常见做法。"
+            },
+            {
+                id: 51,
+                question: "热流道系统中，喷嘴的温度一般略高于熔体的______温度，以防止熔体在喷嘴处凝结。",
+                options: [
+                    { id: "A", text: "熔融" },
+                    { id: "B", text: "注射" },
+                    { id: "C", text: "模具" },
+                    { id: "D", text: "环境" }
+                ],
+                correctAnswer: "A",
+                explanation: "热流道系统中，喷嘴的温度需要保持略高于熔体的熔融温度，以确保熔体在喷嘴处保持流动状态，防止凝结。"
+            },
+            {
+                id: 52,
+                question: "在塑料模具设计中，型腔的脱模斜度一般取0.5°~1°，而型芯的脱模斜度则取_______，以方便脱模并减少制件变形。",
+                options: [
+                    { id: "A", text: "1°~2°" },
+                    { id: "B", text: "0.5°~1°" },
+                    { id: "C", text: "2°~3°" },
+                    { id: "D", text: "0.2°~0.5°" }
+                ],
+                correctAnswer: "A",
+                explanation: "脱模斜度是塑料模具设计中的重要参数之一，用于确保制件能够顺利从模具中脱出，并减少因脱模困难导致的变形或损伤。由于型腔表面与制件的接触面积较大，因此其脱模斜度通常较小，一般取0.5°~1°；而型芯的脱模斜度则较大，一般取1°~2°，以便于脱模。"
+            },
+            {
+                id: 53,
+                question: "分流道的主要作用是将熔体从 _____ 分配到各个型腔，设计时应保证熔体的均匀分配。",
+                options: [
+                    { id: "A", text: "主流道" },
+                    { id: "B", text: "浇口" },
+                    { id: "C", text: "喷嘴" },
+                    { id: "D", text: "料筒" }
+                ],
+                correctAnswer: "A",
+                explanation: "分流道是注射模中连接主流道与型腔的重要通道，其作用是将熔体均匀分配到各个型腔，以保证塑件质量。"
+            },
+            {
+                id: 54,
+                question: "脱模机构设计中，常见的脱模方式包括推杆脱模、推管脱模、______脱模和气动脱模。",
+                options: [
+                    { id: "A", text: "推板" },
+                    { id: "B", text: "斜导柱" },
+                    { id: "C", text: "滑块" },
+                    { id: "D", text: "顶针" }
+                ],
+                correctAnswer: "A",
+                explanation: "脱模机构的设计需要根据塑件的形状、结构及工艺要求选择合适的脱模方式。推板脱模适用于大面积塑件，而气动脱模则适用于薄壁或易变形塑件。"
+            },
+            {
+                id: 55,
+                question: "注射成型中，模具温度对制品质量影响显著，通常通过______系统来调节模具温度，以达到最佳成型效果。",
+                options: [
+                    { id: "A", text: "温控" },
+                    { id: "B", text: "冷却" },
+                    { id: "C", text: "加热" },
+                    { id: "D", text: "循环" }
+                ],
+                correctAnswer: "A",
+                explanation: "模具温度是影响制品质量的关键因素之一。通过温控系统精确调节模具温度，可以改善熔体流动性、减少内应力，并提升制品表面质量。"
+            },
+            {
+                id: 56,
+                question: "注射模中，冷料穴的作用是收集 _____ ，防止其进入型腔，从而避免塑件出现冷料斑等缺陷。",
+                options: [
+                    { id: "A", text: "冷料头" },
+                    { id: "B", text: "杂质" },
+                    { id: "C", text: "气体" },
+                    { id: "D", text: "水分" }
+                ],
+                correctAnswer: "A",
+                explanation: "冷料穴用于收集每次注射后残留的冷料头，防止其进入型腔，从而避免塑件出现冷料斑、气泡等缺陷。"
+            },
+            {
+                id: 57,
+                question: "气动脱模适用于厚壁塑件。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "气动脱模适用于薄壁或易变形塑件，因为其脱模力较小，能够有效避免塑件在脱模过程中发生变形。"
+            },
+            {
+                id: 58,
+                question: "冷却水道的布置应尽量靠近型腔表面，以提高冷却效率。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "A",
+                explanation: "冷却水道靠近型腔表面可以更有效地带走热量，提高冷却效率，缩短成型周期。"
+            },
+            {
+                id: 59,
+                question: "注射成型中，注射速度越快，制品的表面质量越好。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "注射速度过快可能导致熔体流动不平衡，甚至产生飞边或气泡，反而影响制品的表面质量。"
+            },
+            {
+                id: 60,
+                question: "在设计浇口时，浇口尺寸越大越好，因为可以加快熔体填充速度。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "浇口尺寸过大可能导致熔体流动不稳定，甚至造成制品缺陷，因此需要根据制品厚度和材料特性合理设计浇口尺寸。"
+            },
+            {
+                id: 61,
+                question: "碳钢由于其良好的耐磨性，常用于制造注射模具的型腔部分。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "碳钢的耐磨性和尺寸稳定性较差，通常不适合用于制造注射模具的型腔部分。"
+            },
+            {
+                id: 62,
+                question: "热流道系统不需要清理冷料头，因此生产效率更高。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "A",
+                explanation: "热流道系统通过加热保持流道内熔体的流动性，无需清理冷料头，因此生产效率较高。"
+            },
+            {
+                id: 63,
+                question: "注射成型中，模具温度对制品的结晶度有显著影响。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "A",
+                explanation: "模具温度影响塑料的冷却速率，从而影响其结晶行为和结晶度。"
+            },
+            {
+                id: 64,
+                question: "注射成型中，熔体温度越高，制品表面质量越好。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "熔体温度过高可能导致制品出现烧焦、银纹等缺陷，并不一定提高表面质量。"
+            },
+            {
+                id: 65,
+                question: "点浇口适用于厚壁塑件的成型。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "点浇口适用于薄壁塑件，因其进料面积较小，适合快速填充，而厚壁塑件通常采用侧浇口或直接浇口。"
+            },
+            {
+                id: 66,
+                question: "斜导柱的倾斜角越大，滑块的运动行程越短。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "斜导柱的倾斜角越大，滑块的运动行程越长，但所需驱动力也越大。"
+            },
+            {
+                id: 67,
+                question: "在模具温度调节系统中，冷却介质的流速对冷却效率没有影响。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "冷却介质的流速直接影响换热效率，流速越高，冷却效果越好，但过高的流速可能增加系统压力和能耗。"
+            },
+            {
+                id: 68,
+                question: "推杆系统的主要作用是引导模具的开合运动。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "推杆系统的主要作用是实现塑件的脱模，而不是引导模具的开合运动。"
+            },
+            {
+                id: 69,
+                question: "在注射成型制品设计中，加强筋的设计方向应与制品的主应力方向垂直，以提高其承载能力。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "加强筋的设计方向应与制品的主应力方向一致，这样可以更有效地提高其承载能力和抗变形能力。"
+            },
+            {
+                id: 70,
+                question: "硬质合金的硬度和耐磨性高于普通钢材，因此适合用于制造高精度注射模具的型芯部分。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "A",
+                explanation: "硬质合金具有极高的硬度和耐磨性，适合用于制造高精度注射模具的型芯部分。"
+            },
+            {
+                id: 71,
+                question: "注射成型中，冷却时间越长，制品的生产效率越高。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "冷却时间过长会延长整个成型周期，降低生产效率。合理的冷却时间应在保证制品质量的前提下尽可能缩短。"
+            },
+            {
+                id: 72,
+                question: "在注射成型制品设计中，制品的壁厚越厚越好，因为厚壁结构可以提高制品的强度。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "虽然厚壁结构可以提高强度，但过厚的壁厚会导致冷却时间延长、收缩率增大，甚至引起缩水和翘曲等问题，因此需要合理设计壁厚。"
+            },
+            {
+                id: 73,
+                question: "分流道越长，熔体流动阻力越大，容易造成填充不均。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "A",
+                explanation: "分流道过长会增加熔体流动阻力，导致熔体温度下降和流动不平衡，影响塑件质量。"
+            },
+            {
+                id: 74,
+                question: "滑块的导向长度应小于其行程的一半。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "滑块的导向长度应大于其行程的1.5倍，以提高导向精度并减少磨损。"
+            },
+            {
+                id: 75,
+                question: "推板脱模适用于塑件外部有凸起的情况。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "A",
+                explanation: "推板脱模适用于塑件外部有凸起的情况，能够均匀地施加脱模力，避免塑件变形。"
+            },
+            {
+                id: 76,
+                question: "模具温度调节系统中，加热元件的功率越大越好。",
+                options: [
+                    { id: "A", text: "正确" },
+                    { id: "B", text: "错误" }
+                ],
+                correctAnswer: "B",
+                explanation: "加热元件的功率应根据模具尺寸和材料特性进行选择，功率过大可能导致局部过热，影响制品质量。"
+            }
+        ];
+        // ==================== 题库数据结束 ====================
+
+        // 应用状态管理
+        let currentQuestionIndex = 0; // 当前题目索引
+        let userAnswers = {}; // 存储用户答案
+        let answerStatus = {}; // 存储答题状态（正确/错误）
+
+        // DOM元素获取
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const resultContainer = document.getElementById('result-container');
+        const resultTitle = document.getElementById('result-title');
+        const correctAnswer = document.getElementById('correct-answer');
+        const explanation = document.getElementById('explanation');
+        const currentQuestionSpan = document.getElementById('current-question');
+        const answeredCountSpan = document.getElementById('answered-count');
+        const totalQuestionsSpan = document.getElementById('total-questions');
+        const totalQuestionsSpan2 = document.getElementById('total-questions-2');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const directoryItems = document.getElementById('directory-items');
+
+        // 初始化题目总数显示
+        function initTotalQuestions() {
+            totalQuestionsSpan.textContent = questions.length;
+            totalQuestionsSpan2.textContent = questions.length;
+        }
+
+        // 初始化题目目录
+        function initDirectory() {
+            directoryItems.innerHTML = '';
+            for (let i = 0; i < questions.length; i++) {
+                const item = document.createElement('div');
+                item.className = 'directory-item';
+                item.textContent = i + 1;
+                item.addEventListener('click', () => goToQuestion(i));
+                directoryItems.appendChild(item);
+            }
+            updateDirectory();
+        }
+
+        // 更新目录状态显示
+        function updateDirectory() {
+            const items = directoryItems.children;
+            for (let i = 0; i < items.length; i++) {
+                items[i].classList.remove('current', 'answered', 'answered-incorrect');
+                
+                if (i === currentQuestionIndex) {
+                    items[i].classList.add('current');
+                } else if (userAnswers[i] !== undefined) {
+                    if (answerStatus[i]) {
+                        items[i].classList.add('answered');
+                    } else {
+                        items[i].classList.add('answered-incorrect');
+                    }
+                }
+            }
+        }
+
+        // 显示当前题目
+        function displayQuestion() {
+            const question = questions[currentQuestionIndex];
+            
+            // 显示题目文本
+            questionText.textContent = `${currentQuestionIndex + 1}. ${question.question}`;
+            currentQuestionSpan.textContent = currentQuestionIndex + 1;
+            answeredCountSpan.textContent = Object.keys(userAnswers).length;
+
+            // 显示选项
+            optionsContainer.innerHTML = '';
+            question.options.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = `${option.id}. ${option.text}`;
+                optionElement.addEventListener('click', () => selectOption(option.id));
+                optionsContainer.appendChild(optionElement);
+            });
+
+            // 如果已经回答过，显示答案和解析
+            if (userAnswers[currentQuestionIndex] !== undefined) {
+                showResult(userAnswers[currentQuestionIndex]);
+            } else {
+                resultContainer.style.display = 'none';
+            }
+
+            // 更新导航按钮状态（边界控制）
+            prevButton.disabled = currentQuestionIndex === 0;
+            nextButton.disabled = currentQuestionIndex === questions.length - 1;
+
+            // 更新目录显示状态
+            updateDirectory();
+        }
+
+        // 选择选项并提交答案
+        function selectOption(optionId) {
+            // 如果已经回答过，不允许再次选择
+            if (userAnswers[currentQuestionIndex] !== undefined) {
+                return;
+            }
+
+            // 标记选中的选项样式
+            const options = optionsContainer.children;
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].textContent.startsWith(optionId + '.')) {
+                    options[i].classList.add('selected');
+                }
+            }
+
+            // 保存用户答案
+            userAnswers[currentQuestionIndex] = optionId;
+
+            // 显示答题结果
+            showResult(optionId);
+        }
+
+        // 显示答题结果和解析
+        function showResult(selectedOptionId) {
+            const question = questions[currentQuestionIndex];
+            const isCorrect = selectedOptionId === question.correctAnswer;
+            
+            // 保存答题状态
+            answerStatus[currentQuestionIndex] = isCorrect;
+
+            // 显示选项状态（正确/错误）
+            const options = optionsContainer.children;
+            for (let i = 0; i < options.length; i++) {
+                const optionId = options[i].textContent.charAt(0);
+                if (optionId === question.correctAnswer) {
+                    options[i].classList.add('correct');
+                } else if (optionId === selectedOptionId && !isCorrect) {
+                    options[i].classList.add('incorrect');
+                }
+            }
+
+            // 显示结果容器
+            resultContainer.style.display = 'block';
+            resultContainer.className = 'result-container ' + (isCorrect ? 'correct' : 'incorrect');
+            resultTitle.textContent = isCorrect ? '回答正确！' : '回答错误！';
+            correctAnswer.textContent = `正确答案：${question.correctAnswer}`;
+            explanation.textContent = `解析：${question.explanation}`;
+
+            // 更新答题进度
+            answeredCountSpan.textContent = Object.keys(userAnswers).length;
+
+            // 更新目录状态
+            updateDirectory();
+        }
+
+        // 跳转到指定题目
+        function goToQuestion(index) {
+            currentQuestionIndex = index;
+            displayQuestion();
+        }
+
+        // 上一题按钮事件
+        prevButton.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        });
+
+        // 下一题按钮事件
+        nextButton.addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        });
+
+        // 空格键切换到下一题
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space') {
+                event.preventDefault();
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    displayQuestion();
+                }
+            }
+        });
+
+        // 页面初始化
+        function init() {
+            initTotalQuestions();
+            initDirectory();
+            displayQuestion();
+        }
+
+        // 确保DOM加载完成后执行初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+        });
+
+        // 如果DOMContentLoaded已经触发，直接执行init
+        if (document.readyState === 'loading') {
+            // DOM还在加载中，等待DOMContentLoaded事件
+        } else {
+            // DOM已经加载完成，直接执行init
+            init();
+        }
+    </script>
+</body>
+</html>
